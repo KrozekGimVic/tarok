@@ -1,47 +1,31 @@
 import random
 
-def vrednost(index):
-    if index==33 or index==54 or index==53:
+def vrednost(index):                                #   returns the number of points of the card with the index "index", counted at the end of the game
+                                                    #   vrne vrednost karte z indeksom "index", kot je računan na koncu igre
+    if index==33 or index==54 or index==53:         #   pagat, škis in mond, ki so vredni 5 točk
         return 5
-    if index>32:
+    if index>32:                                    #   vsi ostali taroki
         return 1
-    index%=8
+    index%=8                                        #   index postane index barvne karte
     if index==0:
         index+=8
-    if index>4:
+    if index>4:                                     #   8 je kralj, 7 dama, 6 kaval, 5 pob -> če odštejemo 3 dobimo njihovo vrednost
         return index-3
-    return 1
-
-class Talon():
-
-    def __init__(self):
-        self.karte = list()
-
-    def dodaj(self, karta):
-        self.karte.append(karta)
-
-    def razdeli(self, stkupckov):
-        for i in range (0, int(stkupckov)):
-            for j in range(0, int(6/stkupckov)):
-                print(self.karte[0])
-                self.karte.pop(0)
-            print()
-
-    def prin(self):
-        print(self.karte)
+    return 1                                        #   platelci vredni 1 točko
 
 
-class Player():    
+
+class Player():                                     #   objekt za igralce
     
     def __init__(self):
-        self.karte = list()
-        self.kup = list()
+        self.karte = list()                         #   karte na roki igralca
+        self.kup = list()                           #   kup pobranih kart
     
     def add(self, karta):
-        self.karte.append(karta)
+        self.karte.append(karta)                    #   dobivanje kart pri razdeljevanju 
 
-    def vrzi(self, karta):
-        if(self.karte.count(karta)>0):
+    def vrzi(self, karta):                          #   odmetavanje kart med igro
+        if(self.karte.count(karta)>0):              #   vrne 1, če igralec to karto ima in 0, če je nima
             self.karte.remove(karta)
             return 1
         else:
@@ -58,38 +42,75 @@ class Player():
         print("stkart", len(self.kup))
         print("vsota", self.sestevk())
 
-    def poberi(self, mizo):
+    def poberi(self, mizo):                         #   na svoj kup doda vse karte, ki so bile na mizi
         for i in range(0, len(mizo)):
             self.kup.append(vrednost(mizo[i]))
 
-    def sestevk(self):
+    def sestevk(self):                              #   sešteje vrednost svojih kart
         if len(self.kup)%3==0:
             return sum([i for i in self.kup]) - int(len(self.kup)/3)*2
         return sum([i for i in self.kup]) - int(len(self.kup)/3)*2 -1
 
+    def zalozi(self, stkart, igralec):              #   založi podane karte in vrne tiste, ki jih igralec ni imel
+        i=0
+        while i<stkart:
+            print(igralec)
+            karta = int(input())
+            if self.vrzi(karta)==1:
+                self.kup.append(karta)
+            i+=1
 
-def karta(index):
-    if(index>32):
-        return 1, 0, index-32
-    barva=int(index/8)+1
+
+
+class Talon():                                      #   objekt za držanje talona
+
+    def __init__(self):
+        self.karte = list()
+        self.ostank = list()
+
+    def dodaj(self, karta):                         #   pri razdeljevanju prejme karte in jih shrani v karte
+        self.karte.append(karta)
+
+    def odpri(self, stkupckov, igralec):            #   razdeli karte na kupčke in jih poda igralcem
+        kupcki = [list()]
+        for i in range (0, int(stkupckov)):
+            for j in range(0, int(6/stkupckov)):
+                print(self.karte[0])
+                kupcki[i].append(self.karte.pop(0))
+            kupcki.append(list())
+            print()
+        kupcki.pop(6)
+        print(kupcki)
+        kupck = int(input())                        #   igralcu da kupček, ki si ga izbere in da ostanek v "ostank"
+        for karta in kupcki[kupck]:
+            players[igralec].add(karta)
+        kupcki.pop(kupck)
+        for kupcki in kupcki:
+            self.ostank.extend(kupcki)
+        players[igralec].zalozi(6-len(self.ostank), igralec)
+
+    def prin(self):
+        print(self.karte)
+        print(self.ostank)
+
+def karta(index):                                   #   vrne opis karte: (jetarok, katerabarva, index)
+    if(index>32):                                   #   jetarok je 1 če je karta tarok, drugače pa 0
+        return 1, 0, index-32                       #   katerabarva določi barvo s števili od 1 do 4
+    barva=int(index/8)+1                            #   "index" ti pove številko taroka (škis je 22) ali pa moč barve (1 je najmanjši platelc, 8 pa kralj)
     index=index%8
     if(index==0):
         index+=8
     return 0, barva, index
 
-def prinall():
-    '''for i in range(0, 12):
-        player1.prin(i)
-        player2.prin(i)
-        player3.prin(i)
-        player4.prin(i)'''
-    player1.prin()
-    player2.prin()
-    player3.prin()
-    player4.prin()
+def prinall():                                      #   izpiše stanje vseh igralcev in talona
+    i=0
+    for Player in players:
+        players[i].prin()
+        i+=1
+    print()
     talon.prin()
 
-def razdeli(stigralcev):
+def razdeli(stigralcev):                            #   razdeli karte med igralce in talonu
 
     #karte=random.sample(range(1, 55), 54)
     karte=range(1, 55)
@@ -99,39 +120,40 @@ def razdeli(stigralcev):
     for i in range (0, 2):
         for j in range(0, stigralcev):
             for k in range(int(6+i*24+j*24/stigralcev), int(6+i*24+(j+1)*24/stigralcev)):
-                if(j==0):
-                   player1.add(karte[k])
-                elif(j==1):
-                    player2.add(karte[k])
-                elif(j==2):
-                    player3.add(karte[k])
-                else:
-                    player4.add(karte[k])
+                players[j].add(karte[k])
 
-def vrstaigre(stigralcev):
-    igre=[0, 0, 0, 0]
+def vrstaigre(stigralcev):                          #   vrne tip igre, ki se ga bo igralo in igralca, ki je šel igrat v obliki (igralec, igra)
+    igre=[0, 0, 0, 0]                               #   če nihče ne gre igrat nič vrne (0, 0)
     runde=0
     vote=1
-    najvecjaigra=0
-    while vote:
+    najvisjaigra=0
+    igralec=-1
+    while 1:                                        #   dokler ni jasno kdo bo šel igrat (vsi ali en igralec manj imajo tip igre enak 0)
         for i in range (0, stigralcev):
-            if any([igre[i]!=0, runde==0]):
-                print(i)
-                igre[i]=int(input())
-                if najvecjaigra<=igre[i]:
-                    najvecjaigra=igre[i]
-                    igralec=i
-                else:
-                    igre[i]=0
-            if igre.count(0)==3 and runde>0:
-                return igralec+1, najvecjaigra
-            print(igre)
+            if igre[i]!=0 or runde==0:
+                if i!=igralec:
+                    print(i+1)
+                    igre[i]=int(input())            #   igralec gre lahko igrati, če viša igro ali je na vrsti pred tistim, ki ima trenutno najvišjo igro in mu jo izenači
+                    if najvisjaigra<igre[i] or (najvisjaigra==igre[i] and i<igralec):
+                        najvisjaigra=igre[i]
+                        igralec=i
+                    else:
+                        igre[i]=0
+        if igre.count(0)==3:                        #   1 igralec ima veljavno igro in gre igrat
+            print(igralec)
+            k=int(input())
+            if k>najvisjaigra:                      #   svojo igro lahko še viša
+                najvisjaigra=k
+            return igralec+1, najvisjaigra
+        if igre.count(0)==4:                        #   nihče ni šel igrat, igralo se bo klopa
+            return 0, 0
+        print(igre)
         runde+=1
         #print(stigralcev)
         #print(igre.count(0))
     
-def klici(stigralcev):
-    if(stigralcev==4):
+def klici(stigralcev, najvisjaigra, igralec):
+    if stigralcev==4 and najvisjaigra<4:            #   pri ne-solo-igri v štiri vpraša igralca, ki je šel igrat katerega kralja bo klical 
         kralji = ["kriz", "pik", "src", "karo"]
         print(igralec, "kralj")
         a = input()
@@ -140,14 +162,14 @@ def klici(stigralcev):
             if(a.lower()==kralji[i]):
                 return i+1
     else:
-        return 0
+        return 0                                    #   vrne 0, če v igri sodelujeta 2 ali 3 igralci ali pa je igra solo
 
-def stih(miza, stigralcev):
+def stih(miza, stigralcev):                         #   dobi karte po vrsti, kot so padale in vrne igralca, ki je pobral štih 
     tarok = list()
     barva = list()
     index = list()
-    for i in range(0, stigralcev):
-        a, b, c = karta(miza[i])
+    for miza in miza:
+        a, b, c = karta(miza)
         tarok.append(a)
         barva.append(b)
         index.append(c)
@@ -168,77 +190,48 @@ def stih(miza, stigralcev):
             zmaga=i
     return zmaga
 
-def igra(stigralcev):
-    for i in range(0, int(48/stigralcev)):
+def igra(stigralcev):                               #   "odsimulira" igro za število igralcev (stigralcev):
+    for i in range(0, int(48/stigralcev)):          #   48/stigralcev je število rund
         miza = list()
         zacne = 0
         for j in range(zacne, zacne+stigralcev):
-            if((j+zacne)%4==0):
+            print((zacne+j)%stigralcev+1)
+            st=int(input())
+            while players[(zacne+j)%stigralcev].vrzi(st)==0:
                 print(j+1)
                 st=int(input())
-                while player1.vrzi(st)==0:
-                    print(j+1)
-                    st=int(input())
-                print(st)
-                miza.append(st)
-            elif((j+zacne)%4==1):
-                print(j+1)
-                st=int(input())
-                while player2.vrzi(st)==0:
-                    print(j+1)
-                    st=int(input())
-                print(st)
-                miza.append(st)
-            elif((j+zacne)%4==2):
-                print(j+1)
-                st=int(input())
-                while player3.vrzi(st)==0:
-                    print(j+1)
-                    st=int(input())
-                print(st)
-                miza.append(st)
-            else:
-                print(j+1)
-                st=int(input())
-                while player4.vrzi(st)==0:
-                    print(j+1)
-                    st=int(input())
-                print(st)
-                miza.append(st)
-        zacne = stih(miza, stigralcev)
-        if zacne==0:
-            player1.poberi(miza)
-        elif zacne==1:
-            player2.poberi(miza)
-        elif zacne==2:
-            player3.poberi(miza)
-        elif zacne==3:
-            player4.poberi(miza)
+            print(st)
+            miza.append(st)
+        zacne += stih(miza, stigralcev)
+        zacne = zacne % stigralcev
+        players[zacne].poberi(miza)
 
+stigralcev = int(input())                           #   dobi število igralcev, ki bodo igrali
 
-player1 = Player()
-player2 = Player()
-player3 = Player()
-player4 = Player()
-talon = Talon()
+players = [Player()]                                #   ustvari toliko objektov Player()
 
-stigralcev = int(input())
+for i in range(1, stigralcev):
+    players.append(Player())
 
-razdeli(stigralcev)
+talon = Talon()                                     #   ustvari talon
+
+razdeli(stigralcev)                                 #   razdeli karte
 #prinall()
-igralec, najvecjaigra = vrstaigre(stigralcev)
+igralec, najvisjaigra = vrstaigre(stigralcev)       #   ugotovi tip igre
 print(igralec)
 
-kralj = klici(stigralcev)
+kralj = klici(stigralcev, najvisjaigra, igralec)    #   vpraša tistega igralca, ki gre igrat v katerem kralju gre igrat 
 
-talon.razdeli(int(6/(4-najvecjaigra)))
+if najvisjaigra<7:
+    stkupckov = najvisjaigra%3
+    if stkupckov==0:
+        stkupckov=3
+    stkupckov = 4 - stkupckov
+    stkupckov = int(6/stkupckov)
+    talon.odpri(stkupckov, igralec)                 #   mu pokaže talon
 
-print(najvecjaigra)
+print(najvisjaigra)
 
-igra(stigralcev)
+igra(stigralcev)                                    #   odsimulira igro
 
-print(player1.sestevk())
-print(player2.sestevk())
-print(player3.sestevk())
-print(player4.sestevk())
 prinall()
