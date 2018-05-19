@@ -37,16 +37,8 @@ class Window(QtWidgets.QWidget):
 
 
 	def Start_game(self):
-		self.b_v_dvoje = QtWidgets.QPushButton('Igra v dvoje')
-		self.b_v_troje = QtWidgets.QPushButton('Igra v troje')
-		self.b_v_stiri = QtWidgets.QPushButton('Igra v štiri')
-		self.b_restart = QtWidgets.QPushButton('Ponastavi igro')
-
-		self.b_v_dvoje.clicked.connect(self.V_dvoje)
-		self.b_v_troje.clicked.connect(self.V_troje)
-		self.b_v_stiri.clicked.connect(self.V_stiri)
-		self.b_restart.clicked.connect(self.Ponastavi)
-
+		
+		self.txt = ['dvoje', 'troje', 'štiri']
 		h_boxes = QtWidgets.QHBoxLayout()
 		l = QtWidgets.QLabel('       ')
 
@@ -55,21 +47,21 @@ class Window(QtWidgets.QWidget):
 		l_box = QtWidgets.QVBoxLayout()
 		r_box = QtWidgets.QVBoxLayout()
 
+		self.PlayButtons = list()
+		for i in range(0, 3):
+			self.PlayButtons.append(QtWidgets.QPushButton("Igra v %s" % self.txt[i]))
+			self.PlayButtons[i].clicked.connect(self.Play_game)
+			l_box.addStretch()
+			l_box.addWidget(self.PlayButtons[i])
+
+		self.b_restart = QtWidgets.QPushButton('Ponastavi igro')
+		self.b_restart.clicked.connect(self.Ponastavi)
+
 		r_box.addStretch()
 		r_box.addWidget(self.b_restart)
-
-		l_box.addStretch()
-		l_box.addWidget(self.b_v_dvoje)
-		l_box.addStretch()
-		l_box.addWidget(self.b_v_troje)
-		l_box.addStretch()
-		l_box.addWidget(self.b_v_stiri)
-		l_box.addStretch()
-		l_box.addStretch()
-		l_box.addStretch()
-		l_box.addStretch()
-		l_box.addStretch()
-		l_box.addStretch()
+		
+		for i in range(0, 5):
+			l_box.addStretch()
 		
 		h_boxes.addLayout(l_box)
 		h_boxes.addStretch()
@@ -80,23 +72,15 @@ class Window(QtWidgets.QWidget):
 	def Ponastavi(self):
 		self.game_started = 0
 
-	def V_dvoje(self):
+	def Play_game(self, i):
 		if self.game_started == 0:
+			sender = self.sender()
+			for i in range(0, 3):
+				if sender.text().find(self.txt[i]) > 0:
+					stigralcev = i+2
+					break
+			print(stigralcev)
 			self.game_started = 1
-			self.Play_game(2)
-
-	def V_troje(self):
-		if self.game_started == 0:
-			self.game_started = 1
-			self.Play_game(3)
-
-	def V_stiri(self):
-		if self.game_started == 0:
-			self.game_started = 1
-			self.Play_game(4)
-
-	def Play_game(self, stigralcev):
-		print(stigralcev)
 
 	def clearLayout(self):
 		while self.count():
@@ -104,18 +88,7 @@ class Window(QtWidgets.QWidget):
 			if child.widget():
 				child.widget().deleteLater()
 
-	'''def changelayout(self):
-		self.clearLayout()
-		neki = QtWidgets.QLabel('neki')
-		nek = QtWidgets.QHBoxLayout()
-		nek.addStretch()
-		nek.addWidget(neki)
-		nek.addStretch()
-		self.setLayout(nek)'''
-
 app = QtWidgets.QApplication(sys.argv)
 window = Window()
 window.Start_game()
-a = input()
-#window.changelayout()
 sys.exit(app.exec_())
