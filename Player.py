@@ -1,3 +1,5 @@
+from Miza import Miza
+
 def vrednost(index):                                #   returns the number of points of the card with the index "index", counted at the end of the game
                                                     #   vrne vrednost karte z indeksom "index", kot je računan na koncu igre
     if index==33 or index==54 or index==53:         #   pagat, škis in mond, ki so vredni 5 točk
@@ -30,16 +32,16 @@ class Player():                                     #   objekt za igralce
         else:
             return 0
 
-    def prin(self):
-        print(self.karte)
-        print(self.kup)
+    def prin(self, st):
+        print(self.karte[st])
+        #print(self.kup)
         '''print("1.", self.kup.count(1))
         print("2.", self.kup.count(2))
         print("3.", self.kup.count(3))
         print("4.", self.kup.count(4))
         print("5.", self.kup.count(5))'''
-        print("stkart", len(self.kup))
-        print("vsota", self.sestevk())
+        #print("stkart", len(self.kup))
+        #print("vsota", self.sestevk())
 
     def poberi(self, mizo):                         #   na svoj kup doda vse karte, ki so bile na mizi
         if self.partner==-1:
@@ -70,3 +72,26 @@ class Player():                                     #   objekt za igralce
         self.kup.clear()
         self.partner = partnr
         return bivsi_kup
+
+    def prink(self):
+        print(self.karte)
+        print(self.kup)
+'''
+
+class Nasprotnik():
+
+    def __init__(self):
+        self.karte = 0
+        self.igra = 0
+        self.klican = 0
+        self.kup = 0
+
+    def add(self, stkart):
+        self.karte += stkart
+
+    def vrzi(self, karta):
+        self.stkart -= 1
+
+    def zalozi(self, karte):
+        for karta in karte:
+            self.'''
